@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas - Sistema de Inventario</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header>
+    <nav id="navbar">
+        <h1>INVENTARIO</h1>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('inicio') }}">Inicio</a></li>
+            <li><a href="{{ url_for('ver_productos') }}">Productos</a></li>
+            <li><a href="{{ url_for('ver_clientes') }}">Clientes</a></li>
+            <li><a href="{{ url_for('ver_ventas') }}" class="active">Ventas</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <h2>Gestión de Ventas</h2>
+
+    <div class="contenedor-ventas">
+        <!-- Formulario para registrar venta -->
+        <div class="form-box">
+            <h3>Registrar Venta</h3>
+
+            <form action="/ventas" method="post">
+                <div class="form-group">
+                    <label for="id_producto">Producto</label>
+                    <select id="id_producto" name="id_producto" required>
+                        <option value="">-- Seleccionar Producto --</option>
+                        {% for p in productos %}
+                        <option value="{{ p.id }}">{{ p.tipo }} - ${{ "%.2f"|format(p.precio) }} (Stock: {{ p.cantidad }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_cliente">Cliente</label>
+                    <select id="id_cliente" name="id_cliente" required>
+                        <option value="">-- Seleccionar Cliente --</option>
+                        {% for c in clientes %}
+                        <option value="{{ c.id }}">{{ c.nombre }} {{ c.apellido }} ({{ c.email }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cantidad">Cantidad</label>
+                    <input type="number" id="cantidad" name="cantidad" placeholder="Cantidad a vender" required min="1">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Registrar Venta</button>
+            </form>
+        </div>
+
+        <!-- Tabla de ventas -->
+        <div class="tabla-box">
+            <h2>Historial de Ventas</h2>
+
+            {% if ventas %}
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>PRODUCTO</th>
+                            <th>CLIENTE</th>
+                            <th>CANTIDAD</th>
+                            <th>FECHA</th>
+                            <th>TOTAL</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in ventas %}
+                        <tr>
+                            <td>{{ v.id }}</td>
+                            <td>{{ v.producto_ref.tipo }}</td>
+                            <td>{{ v.cliente_ref.nombre }} {{ v.cliente_ref.apellido }}</td>
+                            <td>{{ v.cantidad }}</td>
+                            <td>{{ v.fecha.strftime('%d/%m/%Y %H:%M') if v.fecha else 'N/A' }}</td>
+                            <td class="total-cell">${{ "%.2f"|format(v.total) }}</td>
+                            <td>
+                                <form action="/ventas/{{ v.id }}/eliminar" method="post" style="display:inline;">
+                                    <button class="btn btn-delete btn-small" type="submit" onclick="return confirm('¿Estás seguro?')">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Resumen de ventas -->
+            <div class="ventas-summary">
+                <div class="summary-card">
+                    <h4>Total de Ventas</h4>
+                    <p class="summary-number">{{ ventas|length }}</p>
+                </div>
+                <div class="summary-card">
+                    <h4>Monto Total</h4>
+                    <p class="summary-number">${{ "%.2f"|format(ventas|sum(attribute='total')) }}</p>
+                </div>
+                <div class="summary-card">
+                    <h4>Promedio por Venta</h4>
+                    <p class="summary-number">${{ "%.2f"|format((ventas|sum(attribute='total')) / (ventas|length) if ventas|length > 0 else 0) }}</p>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>🛒 No hay ventas registradas aún</p>
+                <p>Registra la primera venta usando el formulario anterior</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2024 Sistema de Gestión de Inventario. Todos los derechos reservados.</p>
+</footer>
+
+</body>
+</html>
