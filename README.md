@@ -155,14 +155,6 @@ Para reiniciar la base de datos:
 rm productos.db
 python app.py
 
-2. Variables de entorno (Opcional)
-
-Puedes crear un archivo .env en la carpeta backend:
-
-FLASK_ENV=development
-FLASK_DEBUG=True
-SECRET_KEY=tu-clave-secreta
-
 SOLUCION DE PROBLEMAS
 
 Problema: "No such column"
