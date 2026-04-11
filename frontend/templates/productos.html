@@ -2,111 +2,113 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Productos - Sistema de Inventario</title>
+    <title>Productos</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<header>
-    <nav id="navbar">
-        <h1>INVENTARIO</h1>
-        <ul class="nav-links">
-            <li><a href="{{ url_for('inicio') }}">Inicio</a></li>
-            <li><a href="{{ url_for('ver_productos') }}" class="active">Productos</a></li>
-            <li><a href="{{ url_for('ver_clientes') }}">Clientes</a></li>
-        </ul>
-    </nav>
-</header>
 
-<main>
-    <h2>Gestión de Productos</h2>
+    <header>
+        <nav id="navbar">
+            <h1>📦 Inventario & Ventas</h1>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('inicio') }}">Inicio</a></li>
+                <li><a href="{{ url_for('ver_productos') }}" class="active">Productos</a></li>
+                <li><a href="{{ url_for('ver_clientes') }}">Clientes</a></li>
+                <li><a href="{{ url_for('ver_ventas') }}">Ventas</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <div class="contenedor-productos">
-        <!-- Formulario para agregar producto -->
-        <div class="form-box">
-            <h3>Agregar Producto</h3>
+    <main>
+        <h2>Gestión de Productos</h2>
 
-            <form action="/productos" method="post">
-                <div class="form-group">
-                    <label for="tipo">Tipo de Producto</label>
-                    <input type="text" id="tipo" name="tipo" placeholder="Ej: Laptop, Mouse, Teclado" required>
-                </div>
+        <div class="contenedor-productos">
 
-                <div class="form-group">
-                    <label for="cantidad">Cantidad</label>
-                    <input type="number" id="cantidad" name="cantidad" placeholder="Cantidad en stock" required min="0">
-                </div>
+            <!-- Formulario agregar producto -->
+            <div class="form-box">
+                <h3>➕ Agregar Producto</h3>
+                <form method="POST" action="{{ url_for('ver_productos') }}">
+                    <div class="form-group">
+                        <label for="tipo">Tipo de producto</label>
+                        <input type="text" id="tipo" name="tipo" placeholder="Ej: Laptop, Mouse..." required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="precio">Precio</label>
-                    <input type="number" id="precio" name="precio" placeholder="Precio unitario" required min="0" step="0.01">
-                </div>
+                    <div class="form-group">
+                        <label for="cantidad">Cantidad en stock</label>
+                        <input type="number" id="cantidad" name="cantidad" min="0" placeholder="0" required>
+                    </div>
 
-                <button type="submit" class="btn btn-primary">Guardar Producto</button>
-            </form>
-        </div>
+                    <div class="form-group">
+                        <label for="precio">Precio ($)</label>
+                        <input type="number" id="precio" name="precio" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
 
-        <!-- Tabla de productos -->
-        <div class="tabla-box">
-            <h2>Lista de Productos</h2>
-
-            {% if productos %}
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>TIPO</th>
-                            <th>CANTIDAD</th>
-                            <th>PRECIO</th>
-                            <th>TOTAL</th>
-                            <th>ACCIONES</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in productos %}
-                        <tr>
-                            <td>{{ p.id }}</td>
-                            <td>{{ p.tipo }}</td>
-                            <td>
-                                <span class="stock-badge {% if p.cantidad < 5 %}stock-bajo{% elif p.cantidad < 10 %}stock-medio{% else %}stock-alto{% endif %}">
-                                    {{ p.cantidad }}
-                                </span>
-                            </td>
-                            <td>${{ "%.2f"|format(p.precio) }}</td>
-                            <td>${{ "%.2f"|format(p.cantidad * p.precio) }}</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-edit" onclick="editarProducto({{ p.id }})">Editar</button>
-                                    <form action="/productos/{{ p.id }}/eliminar" method="post" style="display:inline;">
-                                        <button class="btn btn-delete" type="submit" onclick="return confirm('¿Estás seguro?')">Eliminar</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                    <button type="submit" class="btn btn-primary">💾 Agregar producto</button>
+                </form>
             </div>
-            {% else %}
-            <div class="empty-state">
-                <p>📭 No hay productos registrados aún</p>
-                <p>Agrega el primero usando el formulario anterior</p>
+
+            <!-- Tabla de productos -->
+            <div class="tabla-box">
+                <h2>Lista de Productos</h2>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tipo</th>
+                                <th>Stock</th>
+                                <th>Precio</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in productos %}
+                            <tr>
+                                <td>{{ producto[0] }}</td>
+                                <td>{{ producto[1] }}</td>
+                                <td>
+                                    {% if producto[2] > 10 %}
+                                        <span class="stock-badge stock-alto">{{ producto[2] }}</span>
+                                    {% elif producto[2] > 3 %}
+                                        <span class="stock-badge stock-medio">{{ producto[2] }}</span>
+                                    {% else %}
+                                        <span class="stock-badge stock-bajo">{{ producto[2] }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="total-cell">${{ "%.2f"|format(producto[3]) }}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ url_for('editar_producto', id=producto[0]) }}" class="btn btn-edit">✏️ Editar</a>
+                                        <form method="POST" action="{{ url_for('eliminar_producto', id=producto[0]) }}">
+                                            <button type="submit" class="btn btn-delete"
+                                                    onclick="return confirm('¿Eliminar este producto?')">
+                                                🗑️ Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <p>📦 No hay productos registrados</p>
+                                        <p>Agrega tu primer producto usando el formulario</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            {% endif %}
+
         </div>
-    </div>
-</main>
+    </main>
 
-<footer>
-    <p>&copy; 2024 Sistema de Gestión de Inventario. Todos los derechos reservados.</p>
-</footer>
-
-<script>
-    function editarProducto(id) {
-        alert('La funcionalidad de edición será implementada pronto');
-    }
-</script>
+    <footer>
+        <p>Sistema de Gestión de Inventario y Ventas &copy; 2026 — Universidad Santiago de Cali</p>
+    </footer>
 
 </body>
 </html>
