@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - Sistema de Inventario</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header>
+    <nav id="navbar">
+        <h1>INVENTARIO</h1>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('inicio') }}">Inicio</a></li>
+            <li><a href="{{ url_for('ver_productos') }}">Productos</a></li>
+            <li><a href="{{ url_for('ver_clientes') }}" class="active">Clientes</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <h2>Gestión de Clientes</h2>
+
+    <div class="contenedor-clientes">
+        <!-- Formulario para agregar cliente -->
+        <div class="form-box">
+            <h3>Agregar Cliente</h3>
+
+            <form action="/clientes" method="post">
+                <div class="form-group">
+                    <label for="tipo_identificacion">Tipo de Identificación</label>
+                    <select id="tipo_identificacion" name="tipo_identificacion" required>
+                        <option value="">-- Seleccionar --</option>
+                        <option value="CC">Cédula de Ciudadanía (CC)</option>
+                        <option value="CE">Cédula de Extranjería (CE)</option>
+                        <option value="NIT">NIT</option>
+                        <option value="PEP">Pasaporte (PEP)</option>
+                        <option value="TI">Tarjeta de Identidad (TI)</option>
+                        <option value="DNI">DNI</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="identificacion">Identificación</label>
+                    <input type="text" id="identificacion" name="identificacion" placeholder="Número de identificación" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Nombre" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="apellido">Apellido</label>
+                    <input type="text" id="apellido" name="apellido" placeholder="Apellido" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="numero_Telefonico">Teléfono</label>
+                    <input type="text" id="numero_Telefonico" name="numero_Telefonico" placeholder="Número de teléfono" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Correo Electrónico</label>
+                    <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+            </form>
+        </div>
+
+        <!-- Tabla de clientes -->
+        <div class="tabla-box">
+            <h2>Lista de Clientes</h2>
+
+            {% if clientes %}
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>TIPO ID</th>
+                            <th>IDENTIFICACIÓN</th>
+                            <th>NOMBRE</th>
+                            <th>APELLIDO</th>
+                            <th>TELÉFONO</th>
+                            <th>EMAIL</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in clientes %}
+                        <tr>
+                            <td>{{ c.id }}</td>
+                            <td><span class="badge">{{ c.tipo_identificacion }}</span></td>
+                            <td>{{ c.identificacion }}</td>
+                            <td>{{ c.nombre }}</td>
+                            <td>{{ c.apellido }}</td>
+                            <td>{{ c.numero_Telefonico }}</td>
+                            <td>{{ c.email }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-edit" onclick="editarCliente({{ c.id }})">Editar</button>
+                                    <form action="/clientes/{{ c.id }}/eliminar" method="post" style="display:inline;">
+                                        <button class="btn btn-delete" type="submit" onclick="return confirm('¿Estás seguro?')">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>👥 No hay clientes registrados aún</p>
+                <p>Agrega el primero usando el formulario anterior</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2024 Sistema de Gestión de Inventario. Todos los derechos reservados.</p>
+</footer>
+
+<script>
+    function editarCliente(id) {
+        alert('La funcionalidad de edición será implementada pronto');
+    }
+</script>
+
+</body>
+</html>
