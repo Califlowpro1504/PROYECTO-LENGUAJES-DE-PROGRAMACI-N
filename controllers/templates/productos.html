@@ -1,0 +1,32 @@
+<h1>Gestión de Productos</h1>
+
+<h2>Agregar producto</h2>
+
+<form action="/productos/agregar" method="POST">
+    <input type="text" name="nombre" placeholder="Nombre">
+    <input type="number" name="precio" placeholder="Precio">
+    <input type="number" name="cantidad" placeholder="Cantidad">
+    <button type="submit">Guardar</button>
+</form>
+
+<h2>Lista de productos</h2>
+
+<table border="1">
+<tr>
+<th>ID</th>
+<th>Nombre</th>
+<th>Precio</th>
+<th>Cantidad</th>
+<th>Acción</th>
+</tr>
+
+{% for p in productos %}
+<tr>
+<td>{{p[0]}}</td>
+<td>{{p[1]}}</td>
+<td>{{p[2]}}</td>
+<td>{{p[3]}}</td>
+<td><a href="/productos/eliminar/{{p[0]}}">Eliminar</a></td>
+</tr>
+{% endfor %}
+</table>
